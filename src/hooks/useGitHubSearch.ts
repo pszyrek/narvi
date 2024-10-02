@@ -8,6 +8,9 @@ interface UseGitHubSearchProps {
 }
 
 const initialPage = 0;
+const minSearchLength = 3;
+const retryCount = 3;
+const staleTime = 1000 * 60 * 5;
 
 export const useGitHubSearch = ({ username }: UseGitHubSearchProps) => {
   const page = useRef(initialPage);
@@ -20,7 +23,9 @@ export const useGitHubSearch = ({ username }: UseGitHubSearchProps) => {
     },
     initialPageParam: initialPage,
     getNextPageParam: () => page.current,
-    retry: false,
-    enabled: !!username,
+    staleTime,
+    retry: retryCount,
+    enabled: !!username && username?.length >= minSearchLength,
+    retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 30000),
   });
 };
