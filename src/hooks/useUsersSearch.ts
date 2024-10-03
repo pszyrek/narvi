@@ -29,7 +29,7 @@ export const useUsersSearch = ({ username }: Props) => {
     staleTime: STALE_TIME,
 
     getNextPageParam: (page: User[]) =>
-      page.length > USERS_PER_PAGE ? pageNumber.current : undefined,
+      page.length === USERS_PER_PAGE ? pageNumber.current : undefined,
     queryFn: async ({ pageParam: page }) => {
       pageNumber.current += 1;
       return fetchUsers({

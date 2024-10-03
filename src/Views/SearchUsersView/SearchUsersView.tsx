@@ -33,7 +33,7 @@ const SearchUserView = ({
 }: Props) => (
   <SearchForm
     infiniteScrollProps={{
-      loadMore: () => fetchNextPage,
+      loadMore: () => fetchNextPage(),
       hasMore: hasNextPage,
     }}
     inputProps={{
