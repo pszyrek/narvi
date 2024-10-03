@@ -1,11 +1,11 @@
 import useDebounce from "../../hooks/useDebounce";
-import { useGitHubSearch } from "../../hooks/useGitHubSearch";
+import { useUsersSearch } from "../../hooks/useUsersSearch";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { useForm } from "react-hook-form";
 import * as yup from "yup";
-import SearchUser from "./SearchUser";
+import SearchUser from "./SearchUsersView";
 
-export interface IFormInputs {
+export interface FormInputs {
   username: string;
 }
 
@@ -16,12 +16,12 @@ const schema = yup.object().shape({
   }),
 });
 
-const SearchUserContainer = () => {
+const SearchUsersViewContainer = () => {
   const {
     register,
     watch,
     formState: { errors: validationErrors },
-  } = useForm<IFormInputs>({
+  } = useForm<FormInputs>({
     mode: "onChange",
     resolver: yupResolver(schema),
   });
@@ -29,28 +29,37 @@ const SearchUserContainer = () => {
   const debouncedUsername = useDebounce(username, 2000);
   const {
     data: users,
-    hasNextPage,
+    error: loadingError,
     fetchNextPage,
+    hasNextPage,
+    isFetching,
     isLoading,
     isRefetching,
-    isFetching,
-    error: loadingError,
-  } = useGitHubSearch({
+  } = useUsersSearch({
     username: debouncedUsername,
   });
 
+  const shouldDisplayNotFoundError =
+    !isLoading &&
+    !loadingError &&
+    !users?.pages?.length &&
+    debouncedUsername?.length >= 3;
+  const notFoundError = shouldDisplayNotFoundError
+    ? { message: "No users found" }
+    : undefined;
+
   return (
     <SearchUser
-      username={debouncedUsername}
-      isLoading={isLoading || isRefetching || isFetching}
-      usersPages={users?.pages}
-      hasNextPage={hasNextPage}
       fetchNextPage={fetchNextPage}
-      register={register}
-      validationErrors={validationErrors}
+      isLoading={isLoading || isRefetching || isFetching}
       loadingError={loadingError}
+      notFoundError={notFoundError}
+      register={register}
+      hasNextPage={hasNextPage}
+      usersPages={users?.pages}
+      validationErrors={validationErrors}
     />
   );
 };
 
-export default SearchUserContainer;
+export default SearchUsersViewContainer;

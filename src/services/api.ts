@@ -2,16 +2,23 @@ import { User } from "../types/user";
 
 const GITHUB_API_BASE_URL = "https://api.github.com";
 
-export const fetchGitHubUsers = async (
-  username: string,
-  page: number
-): Promise<User[]> => {
+interface FetchUsers {
+  page: number;
+  username: string;
+  usersPerPage: number;
+}
+
+export const fetchUsers = async ({
+  page,
+  username,
+  usersPerPage,
+}: FetchUsers): Promise<User[]> => {
   const response = await fetch(
-    `${GITHUB_API_BASE_URL}/search/users?q=${username}&page=${page}&per_page=40`
+    `${GITHUB_API_BASE_URL}/search/users?q=${username}&page=${page}&per_page=${usersPerPage}`
   );
 
   if (!response.ok) {
-    throw new Error("Network response was not ok");
+    throw new Error("Couldn't fetch users!");
   }
 
   const data = await response.json();
